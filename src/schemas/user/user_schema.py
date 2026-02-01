@@ -25,5 +25,12 @@ class UserInDB(BaseModel):
     last_name: str
     username: str
     email: EmailStr
+    password_hash: str
     bio: Optional[str] 
     date_joined: datetime
+
+class UserUpdateRequest(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    bio: Optional[str]
+
