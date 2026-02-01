@@ -1,0 +1,13 @@
+[project]
+name = "skillshare"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.25.0",
+    "pydantic>=2.5.2",
+    "python-dotenv>=1.0.0",
+    "argon2-cffi>=23.2.0",
+    "bson>=0.6.0"
+]
