@@ -85,7 +85,7 @@ async def login(login_data: LoginRequest):
 
 
 @router.get("/me", response_model=UserCreateResponse)
-async def get_current_user(current_user: UserInDB = Depends(get_current_user)):
+async def get_current_user_info(current_user: UserInDB = Depends(get_current_user)):
     return UserCreateResponse(
         id=current_user.id,
         first_name=current_user.first_name,
