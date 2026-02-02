@@ -30,7 +30,7 @@ class UserInDB(BaseModel):
     date_joined: datetime
 
 class UserUpdateRequest(BaseModel):
-    first_name: Optional[str]
-    last_name: Optional[str]
-    bio: Optional[str]
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    bio: Optional[str] = None
 

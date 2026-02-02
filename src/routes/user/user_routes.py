@@ -97,11 +97,11 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_use
     )
 
 @router.get("/{user_id}", response_model=UserCreateResponse)
-def get_user(user_id: str):
+async def get_user(user_id: str):
     users_collection = get_users_collection()
 
     try:
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        user = await users_collection.find_one({"_id": ObjectId(user_id)})
     except:
         raise HTTPException(status_code=404, detail="Invalid user ID format")
     
@@ -136,7 +136,7 @@ async def update_current_user(user_update: UserUpdateRequest, current_user: User
             {"$set": update_doc}
         )
 
-        updated_user = await users_collection.find_ones({"_id": ObjectId(current_user.id)})
+    updated_user = await users_collection.find_one({"_id": ObjectId(current_user.id)})
     
     return UserCreateResponse(
         id = str(updated_user["_id"]),
