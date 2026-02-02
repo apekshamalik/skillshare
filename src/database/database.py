@@ -1,6 +1,9 @@
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
 from typing import Optional
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URL")
 DATABASE_NAME = "skillshare_db"

@@ -1,9 +1,9 @@
 # main.py
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from src.database import connect_to_mongo, close_mongo_connection
-from src.routes.user import router as user_routes 
-app = FastAPI(title="SkillShare Local API")
+from src.database.database import connect_to_mongo, close_mongo_connection
+from src.routes.user.user_routes import router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -13,5 +13,8 @@ async def lifespan(app: FastAPI):
     # Shutdown: Close MongoDB connection
     await close_mongo_connection()
 
+
+app = FastAPI(title="SkillShare Local API", lifespan=lifespan)
+
 # Include the users router under /users
-app.include_router(user_routes.router, prefix="/users", tags=["Users"])
+app.include_router(router, prefix="/users", tags=["Users"])
