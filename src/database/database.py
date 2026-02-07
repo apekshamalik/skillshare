@@ -28,23 +28,23 @@ async def close_mongo_connection():
         client.close()
         print("Closed MongoDB connection")
 
-# Collections
+
 def get_users_collection():
     db = get_database()
     return db.users
 
-# def get_sessions_collection():
-#     db = get_database()
-#     return db.sessions
+def get_sessions_collection():
+    db = get_database()
+    return db.sessions
 
-# def get_enrollments_collection():
-#     db = get_database()
-#     return db.enrollments
+def get_enrollments_collection():
+    db = get_database()
+    return db.enrollments
+       
+def get_ratings_collection():
+    db = get_database()
+    return db.ratings
 
-# def get_ratings_collection():
-#     db = get_database()
-#     return db.ratings
-
-# def get_discussions_collection():
-#     db = get_database()
-#     return db.discussions
+def get_discussions_collection():
+    db = get_database()
+    return db.discussions
