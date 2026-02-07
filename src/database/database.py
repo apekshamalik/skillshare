@@ -3,6 +3,9 @@ from pymongo import MongoClient
 from typing import Optional
 import os
 from dotenv import load_dotenv
+import certifi
+import ssl
+
 load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URL")
@@ -18,9 +21,26 @@ def get_database():
 async def connect_to_mongo():
     """Connect to MongoDB on startup"""
     global client
-    client = AsyncIOMotorClient(MONGO_URL)
-    print(f"Connected to MongoDB at {MONGO_URL}")
-
+    
+    # Create SSL context
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    
+    client = AsyncIOMotorClient(
+        MONGO_URL,
+        serverSelectionTimeoutMS=30000,
+        connectTimeoutMS=20000,
+    )
+    
+    # Test the connection
+    try:
+        await client.admin.command('ping')
+        print(f"Successfully connected to MongoDB")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
+        raise
+    
 async def close_mongo_connection():
     """Close MongoDB connection on shutdown"""
     global client

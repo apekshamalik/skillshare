@@ -14,6 +14,7 @@ from src.database.database import get_users_collection
 
 ph = PasswordHasher()
 router = APIRouter()
+users = []
 
 
 @router.post("/register", response_model = UserCreateResponse, status_code=status.HTTP_201_CREATED)
