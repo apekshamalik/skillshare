@@ -29,9 +29,6 @@ async def connect_to_mongo():
     
     client = AsyncIOMotorClient(
         MONGO_URL,
-        tls=True,
-        tlsAllowInvalidCertificates=True,
-        tlsCAFile=certifi.where(),
         serverSelectionTimeoutMS=30000,
         connectTimeoutMS=20000,
     )
@@ -64,9 +61,9 @@ def get_users_collection():
 #     db = get_database()
 #     return db.enrollments
 
-# def get_ratings_collection():
-#     db = get_database()
-#     return db.ratings
+def get_ratings_collection():
+    db = get_database()
+    return db.ratings
 
 # def get_discussions_collection():
 #     db = get_database()
