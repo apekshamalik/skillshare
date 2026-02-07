@@ -20,9 +20,19 @@ class SessionCreateResponse(SessionCreateRequest):
     created_at: datetime
 
 
-class SessionInDB(SessionCreate):
+class SessionInDB(SessionCreateRequest):
     id: str
     host_id: str
     enrolled_count: int
     status: str
     created_at: datetime
+
+class SessionUpdateRequest(BaseModel):
+    title: str
+    description: str
+    skill_category: str
+    location: str
+    start_time: datetime
+    end_time: datetime
+    capacity: int
+    price: float
