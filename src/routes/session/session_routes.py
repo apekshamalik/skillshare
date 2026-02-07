@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 #create a new session(requires authentication)
-@router.post("/create", response_model = SessionCreateResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model = SessionCreateResponse, status_code=status.HTTP_201_CREATED, operation_id="create_session")
 async def create_session(session: SessionCreateRequest, current_user: UserInDB = Depends(get_current_user)):
 
     sessions_collection = get_sessions_collection()
@@ -53,7 +53,7 @@ async def create_session(session: SessionCreateRequest, current_user: UserInDB =
 
 
 #list all active sessions
-@router.get("/all", response_model=List[SessionCreateResponse])
+@router.get("/all", response_model=List[SessionCreateResponse], operation_id="list_sessions")
 async def list_sessions(): 
     sessions_collection = get_sessions_collection()
 
@@ -88,7 +88,7 @@ async def list_sessions():
 
 
 #get a single session id
-@router.get("/{session_id}", response_model=SessionCreateResponse)
+@router.get("/{session_id}", response_model=SessionCreateResponse, operation_id="get_session")
 async def get_session(session_id: str):
     sessions_collection = get_sessions_collection()
 
@@ -117,7 +117,7 @@ async def get_session(session_id: str):
     )
 
 
-@router.put("/{session_id}", response_model=SessionCreateResponse)
+@router.put("/{session_id}", response_model=SessionCreateResponse, operation_id="update_session")
 async def update_session(
     session_id: str, 
     session_update: SessionUpdateRequest, 
@@ -160,7 +160,7 @@ async def update_session(
     )
 
 #delete a session
-@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT, operation_id="delete_session")
 async def delete_session(
     session_id: str, 
     current_user: UserInDB = Depends(get_current_user)

@@ -17,7 +17,7 @@ router = APIRouter()
 users = []
 
 
-@router.post("/register", response_model = UserCreateResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model = UserCreateResponse, status_code=status.HTTP_201_CREATED, operation_id="register_user")
 async def register_user(user: UserCreateRequest):
     
     users_collection = get_users_collection()
@@ -55,7 +55,7 @@ async def register_user(user: UserCreateRequest):
        date_joined = user_doc["date_joined"]
     )
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=Token, operation_id="login_user")
 async def login(login_data: LoginRequest):
     
     users_collection = get_users_collection()
@@ -85,7 +85,7 @@ async def login(login_data: LoginRequest):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/me", response_model=UserCreateResponse)
+@router.get("/me", response_model=UserCreateResponse, operation_id="get_user")
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_user)):
     return UserCreateResponse(
         id=current_user.id,
@@ -97,7 +97,7 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_use
         date_joined=current_user.date_joined
     )
 
-@router.get("/{user_id}", response_model=UserCreateResponse)
+@router.get("/{user_id}", response_model=UserCreateResponse, operation_id="get_user_by_id")
 async def get_user(user_id: str):
     users_collection = get_users_collection()
 
@@ -119,7 +119,7 @@ async def get_user(user_id: str):
     )
 
 
-@router.put("/me", response_model=UserCreateResponse)
+@router.put("/me", response_model=UserCreateResponse, operation_id="update_user")
 async def update_current_user(user_update: UserUpdateRequest, current_user: UserInDB = Depends(get_current_user)):
     users_collection = get_users_collection()
 
