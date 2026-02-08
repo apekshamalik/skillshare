@@ -82,7 +82,7 @@ async def login(login_data: LoginRequest):
         expires_delta=access_token_expires
     )
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
 
 
 @router.get("/me", response_model=UserCreateResponse, operation_id="get_user")
