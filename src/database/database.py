@@ -57,14 +57,14 @@ def get_sessions_collection():
     db = get_database()
     return db.sessions
 
-def get_enrollments_collection():
-    db = get_database()
-    return db.enrollments
+# def get_enrollments_collection():
+#     db = get_database()
+#     return db.enrollments
        
 def get_ratings_collection():
     db = get_database()
     return db.ratings
 
-def get_discussions_collection():
-    db = get_database()
-    return db.discussions
+# def get_discussions_collection():
+#     db = get_database()
+#     return db.discussions
