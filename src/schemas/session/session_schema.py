@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from pydantic import BaseModel
 from typing import Optional
 
@@ -9,12 +9,14 @@ class SessionCreateRequest(BaseModel):
     location: str
     start_time: datetime
     end_time: datetime
+    date: date
     capacity: int
     price: float #only needed for materials (operating on free model)
 
 class SessionCreateResponse(SessionCreateRequest):
     id: str
     host_id: str
+    date: date
     enrolled_count: int
     status: str         # "active", "cancelled", "completed"
     created_at: datetime
@@ -31,6 +33,7 @@ class SessionUpdateRequest(BaseModel):
     title: str
     description: str
     skill_category: str
+    date: date
     location: str
     start_time: datetime
     end_time: datetime
