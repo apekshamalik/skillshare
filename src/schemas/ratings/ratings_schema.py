@@ -5,7 +5,7 @@ from datetime import datetime, date
 class CreateRatingRequest(BaseModel):
     session_id: str
     rating: int = Field(..., ge=1, le=5) 
-    comment = Optional[str] = None
+    comment: Optional[str] = None
 
 class CreateRatingResponse(BaseModel):
     id: str
@@ -25,4 +25,4 @@ class SessionRatingsResponse(BaseModel):
     session_title: str
     average_rating: float
     total_ratings: int
-    ratings = list[CreateRatingResponse]
+    ratings: list[CreateRatingResponse]

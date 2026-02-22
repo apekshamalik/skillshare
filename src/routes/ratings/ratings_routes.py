@@ -1,17 +1,18 @@
 from fastapi import FastAPI, HTTPException, APIRouter, Depends, status
 from bson import ObjectId
 from datetime import date, datetime
-from src.schemas.ratings.ratings_schema import CreateRatingRequest, CreateRatingResponse, SessionsRatingsResponse
+from src.schemas.ratings.ratings_schema import CreateRatingRequest, CreateRatingResponse, SessionRatingsResponse
 from src.schemas.user.user_schema import UserInDB
 from src.database.database import get_ratings_collection, get_sessions_collection, get_users_collection
-from src.auth.dependencies import get_current_user, UserInDB
+from src.auth.dependencies import get_current_user
 
 router = APIRouter()
 
 @router.post("/create-rating", response_model=CreateRatingResponse, status_code=status.HTTP_201_CREATED)
 async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = Depends(get_current_user)):
 
-    users_collection, sessions_collection = get_sessions_collection(), get_users_collection()
+    sessions_collection = get_sessions_collection()
+    users_collection = get_users_collection()
     
     try:
         session = await sessions_collection.find_one({"_id": ObjectId(rating.session_id)})
@@ -50,6 +51,7 @@ async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = De
     rating_doc = {
         "session_id": ObjectId(rating.session_id),
         "session_title": session["title"],
+        "session_date": session["date"],
         "rater_id": ObjectId(current_user.id),
         "host_id": ObjectId(session["host_id"]),
         "host_name": host_name,
@@ -67,6 +69,7 @@ async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = De
         id=str(rating_doc["_id"]),
         session_id=str(rating_doc["session_id"]),
         session_title=rating_doc["session_title"],
+        session_date=rating_doc["session_date"],
         host_id=str(rating_doc["host_id"]),
         host_name=rating_doc["host_name"],
         reviewer_id=str(rating_doc["reviewer_id"]),
@@ -76,10 +79,12 @@ async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = De
         created_at=rating_doc["created_at"]
     )
 
-@router.get("/session/{session_id}/ratings", response_model=SessionsRatingsResponse)
+@router.get("/session/{session_id}/ratings", response_model=SessionRatingsResponse)
 async def get_ratings_for_session(session_id: str):
     
-    users_collection, sessions_collection, ratings_collection = get_sessions_collection(), get_users_collection(), get_ratings_collection()
+    sessions_collection = get_sessions_collection()
+    users_collection = get_users_collection()
+    ratings_collection = get_ratings_collection()
     try:
         session = await sessions_collection.find_one({"_id": ObjectId(session_id)})
     except Exception:
@@ -92,7 +97,7 @@ async def get_ratings_for_session(session_id: str):
     ratings = await ratings_list.to_list(length=None)
 
     if not ratings:
-        return SessionsRatingsResponse(
+        return SessionRatingsResponse(
             session_id=session_id,
             session_title=session["title"],
             average_rating=0.0,
@@ -108,6 +113,7 @@ async def get_ratings_for_session(session_id: str):
             id=str(r["_id"]),
             session_id=str(r["session_id"]),
             session_title=r["session_title"],
+            session_date=r["session_date"],
             host_id=str(r["host_id"]),
             host_name=r["host_name"],
             reviewer_id=str(r["reviewer_id"]),
@@ -118,7 +124,7 @@ async def get_ratings_for_session(session_id: str):
         ) for r in ratings
     ]
 
-    return SessionsRatingsResponse(
+    return SessionRatingsResponse(
         session_id=session_id,
         session_title=session["title"],
         average_rating=average_rating,
