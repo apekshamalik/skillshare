@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, APIRouter, Depends, status
 from typing import List
 from bson import ObjectId
+from src.schemas import session
 from src.schemas.session.session_schema import SessionCreateRequest, SessionCreateResponse, SessionInDB, SessionUpdateRequest
 from datetime import datetime, timezone
 from src.database.database import get_sessions_collection
@@ -15,9 +16,10 @@ router = APIRouter()
 @router.post("/create", response_model = SessionCreateResponse, status_code=status.HTTP_201_CREATED, operation_id="create_session")
 async def create_session(session: SessionCreateRequest, current_user: UserInDB = Depends(get_current_user)):
 
-    # Validate date is not in the past
     today = datetime.now(timezone.utc).date()
-    if session.date < today:
+    session_date = session.start_time.date()
+
+    if session_date < today:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Session date cannot be in the past"
@@ -30,11 +32,10 @@ async def create_session(session: SessionCreateRequest, current_user: UserInDB =
             detail="end_time must be after start_time"
         )
 
-    # Validate that start_time and end_time fall on the specified date
-    if session.start_time.date() != session.date or session.end_time.date() != session.date:
+    if session.start_time.date() != session.end_time.date():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="start_time and end_time must fall on the specified date"
+            detail="start_time and end_time must be on the same date"
         )
 
     # Strip whitespace and validate fields aren't just whitespace
