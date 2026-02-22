@@ -30,12 +30,12 @@ class SessionInDB(SessionCreateRequest):
     created_at: datetime
 
 class SessionUpdateRequest(BaseModel):
-    title: str
-    description: str
-    skill_category: str
-    date: date
-    location: str
-    start_time: datetime
-    end_time: datetime
-    capacity: int
-    price: float
+    title: Optional[str] = None
+    description: Optional[str] = None
+    skill_category: Optional[str] = None
+    date: Optional[date] = None
+    location: Optional[str] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    capacity: Optional[int] = None
+    price: Optional[float] = None

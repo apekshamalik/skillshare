@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from src.database.database import connect_to_mongo, close_mongo_connection
 from src.routes.user.user_routes import router as user_router
 from src.routes.session.session_routes import router as session_router
+from src.routes.ratings.ratings_routes import router as ratings_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -29,3 +30,4 @@ app.add_middleware(
 # Include routers
 app.include_router(user_router, prefix="/users", tags=["Users"])
 app.include_router(session_router, prefix="/sessions", tags=["Sessions"])
+app.include_router(ratings_routes, prefix="/ratings", tags=["Ratings"])
