@@ -9,7 +9,7 @@ class SessionCreateRequest(BaseModel):
     location: str = Field(..., min_length=1, max_length=300, description="Session location")
     start_time: datetime
     end_time: datetime
-    capacity: int
+    capacity: Optional[int] = Field(default=1, ge=1)
     price: float #only needed for materials (operating on free model)
 
 class SessionCreateResponse(BaseModel):
