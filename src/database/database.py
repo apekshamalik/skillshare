@@ -31,6 +31,7 @@ async def connect_to_mongo():
         MONGO_URL,
         serverSelectionTimeoutMS=30000,
         connectTimeoutMS=20000,
+        tz_aware=True
     )
     
     # Test the connection
@@ -57,9 +58,9 @@ def get_sessions_collection():
     db = get_database()
     return db.sessions
 
-# def get_enrollments_collection():
-#     db = get_database()
-#     return db.enrollments
+def get_enrollments_collection():
+    db = get_database()
+    return db.enrollments
        
 def get_ratings_collection():
     db = get_database()
