@@ -15,13 +15,62 @@ router = APIRouter()
 @router.post("/create", response_model = SessionCreateResponse, status_code=status.HTTP_201_CREATED, operation_id="create_session")
 async def create_session(session: SessionCreateRequest, current_user: UserInDB = Depends(get_current_user)):
 
+    # Validate date is not in the past
+    today = datetime.now(timezone.utc).date()
+    if session.date < today:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Session date cannot be in the past"
+        )
+
+    # Validate end_time is after start_time
+    if session.end_time <= session.start_time:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="end_time must be after start_time"
+        )
+
+    # Validate that start_time and end_time fall on the specified date
+    if session.start_time.date() != session.date or session.end_time.date() != session.date:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="start_time and end_time must fall on the specified date"
+        )
+
+    # Strip whitespace and validate fields aren't just whitespace
+    title = session.title.strip()
+    description = session.description.strip()
+    skill_category = session.skill_category.strip()
+    location = session.location.strip()
+
+    if not title:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Title cannot be empty or whitespace only"
+        )
+    if not description:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Description cannot be empty or whitespace only"
+        )
+    if not skill_category:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Skill category cannot be empty or whitespace only"
+        )
+    if not location:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Location cannot be empty or whitespace only"
+        )
+
     sessions_collection = get_sessions_collection()
-    
+
     session_doc = {
-        "title": session.title,
-        "description": session.description,
-        "skill_category": session.skill_category,
-        "location": session.location,
+        "title": title,
+        "description": description,
+        "skill_category": skill_category,
+        "location": location,
         "start_time": session.start_time,
         "end_time": session.end_time,
         "date": session.date,
@@ -33,7 +82,14 @@ async def create_session(session: SessionCreateRequest, current_user: UserInDB =
         "created_at": datetime.now(timezone.utc)
     }
 
-    result = await sessions_collection.insert_one(session_doc)
+    try:
+        result = await sessions_collection.insert_one(session_doc)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create session: database error"
+        )
+
     session_doc["_id"] = result.inserted_id
 
     return SessionCreateResponse(
