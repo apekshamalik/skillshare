@@ -9,7 +9,7 @@ import ssl
 load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URL")
-DATABASE_NAME = "skillshare_db"
+DATABASE_NAME = os.getenv("DATABASE_NAME", "skillshare_db")
 
 client: Optional[AsyncIOMotorClient] = None
 
