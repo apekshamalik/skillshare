@@ -1,9 +1,14 @@
 from fastapi import FastAPI, HTTPException, APIRouter, Depends, status
 from bson import ObjectId
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from src.schemas.ratings.ratings_schema import CreateRatingRequest, CreateRatingResponse, SessionRatingsResponse
 from src.schemas.user.user_schema import UserInDB
-from src.database.database import get_ratings_collection, get_sessions_collection, get_users_collection
+from src.database.database import (
+    get_enrollments_collection,
+    get_ratings_collection,
+    get_sessions_collection,
+    get_users_collection,
+)
 from src.auth.dependencies import get_current_user
 
 router = APIRouter()
@@ -11,6 +16,8 @@ router = APIRouter()
 @router.post("/create-rating", response_model=CreateRatingResponse, status_code=status.HTTP_201_CREATED)
 async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = Depends(get_current_user)):
 
+    enrollments_collection = get_enrollments_collection()
+    ratings_collection = get_ratings_collection()
     sessions_collection = get_sessions_collection()
     users_collection = get_users_collection()
     
@@ -21,20 +28,26 @@ async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = De
 
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    
+
     if session["host_id"] == current_user.id:
         raise HTTPException(status_code=400, detail="Host cannot self-rate")
 
-    if session["end_time"] > datetime.now():
-        raise HTTPException(status_code=400, detail="Cannot rate a session that has not ended yet")
-
     if session["status"] == "cancelled":
         raise HTTPException(status_code=400, detail="Cannot rate a cancelled session")
-    
-    #TODO: Check if user was enrolled
-    # If not enrolled, cannot rate
 
-    existing_rating = await get_ratings_collection().find_one({
+    if session["end_time"] > datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Cannot rate a session that has not ended yet")
+
+    enrollment = await enrollments_collection.find_one({
+        "session_id": ObjectId(rating.session_id),
+        "user_id": ObjectId(current_user.id),
+        "status": "enrolled"
+    })
+
+    if not enrollment:
+        raise HTTPException(status_code=403, detail="Only enrolled users can rate this session")
+
+    existing_rating = await ratings_collection.find_one({
         "session_id": ObjectId(rating.session_id),
         "rater_id": ObjectId(current_user.id)
     })
@@ -51,7 +64,7 @@ async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = De
     rating_doc = {
         "session_id": ObjectId(rating.session_id),
         "session_title": session["title"],
-        "session_date": session["date"],
+        "session_date": session["start_time"].date(),
         "rater_id": ObjectId(current_user.id),
         "host_id": ObjectId(session["host_id"]),
         "host_name": host_name,
@@ -59,10 +72,10 @@ async def create_rating(rating: CreateRatingRequest, current_user: UserInDB = De
         "reviewer_name": f"{current_user.first_name} {current_user.last_name}",
         "rating": rating.rating,
         "comment": rating.comment,
-        "created_at": datetime.now()
+        "created_at": datetime.now(timezone.utc)
     }
 
-    result = await get_ratings_collection().insert_one(rating_doc)
+    result = await ratings_collection.insert_one(rating_doc)
     rating_doc["_id"] = result.inserted_id
 
     return CreateRatingResponse(
