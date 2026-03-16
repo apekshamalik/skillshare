@@ -21,20 +21,20 @@ async def create_session(session: SessionCreateRequest, current_user: UserInDB =
 
     if session_date < today:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Session date cannot be in the past"
         )
 
     # Validate end_time is after start_time
     if session.end_time <= session.start_time:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="end_time must be after start_time"
         )
 
     if session.start_time.date() != session.end_time.date():
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="start_time and end_time must be on the same date"
         )
 
@@ -46,22 +46,22 @@ async def create_session(session: SessionCreateRequest, current_user: UserInDB =
 
     if not title:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Title cannot be empty or whitespace only"
         )
     if not description:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Description cannot be empty or whitespace only"
         )
     if not skill_category:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Skill category cannot be empty or whitespace only"
         )
     if not location:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Location cannot be empty or whitespace only"
         )
 
