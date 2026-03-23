@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime, date
+from datetime import datetime
 
 class CreateRatingRequest(BaseModel):
     session_id: str
@@ -11,7 +11,7 @@ class CreateRatingResponse(BaseModel):
     id: str
     session_id: str
     session_title: str
-    session_date: date
+    session_date: datetime  # ← Changed from date to datetime
     host_id: str
     host_name: str
     reviewer_id: str
@@ -28,9 +28,8 @@ class SessionRatingsResponse(BaseModel):
     ratings: list[CreateRatingResponse]
 
 class HostRatingSummary(BaseModel):
-    """Summary of all ratings for a host/instructor"""
     host_id: str
     host_name: str
     average_rating: float
     total_ratings: int
-    ratings_breakdown: dict  # {5: 10, 4: 5, 3: 2, 2: 1, 1: 0}
+    ratings_breakdown: dict

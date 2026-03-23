@@ -92,13 +92,13 @@ async def create_rating(
     rating_doc = {
         "session_id": ObjectId(rating.session_id),
         "session_title": session["title"],
-        "session_date": session["start_time"].date(),
+        "session_date": session["start_time"],
         "host_id": ObjectId(session["host_id"]),
         "host_name": host_name,
         "reviewer_id": ObjectId(current_user.id),
         "reviewer_name": f"{current_user.first_name} {current_user.last_name}",
         "rating": rating.rating,
-        "comment": rating.comment,
+        "comment": rating.comment or "",  # Handle None
         "created_at": datetime.now(timezone.utc)
     }
 
@@ -115,7 +115,7 @@ async def create_rating(
         reviewer_id=str(rating_doc["reviewer_id"]),
         reviewer_name=rating_doc["reviewer_name"],
         rating=rating_doc["rating"],
-        comment=rating_doc.get("comment", ""),
+        comment=rating_doc["comment"],
         created_at=rating_doc["created_at"]
     )
 
