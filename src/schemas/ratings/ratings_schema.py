@@ -26,3 +26,11 @@ class SessionRatingsResponse(BaseModel):
     average_rating: float
     total_ratings: int
     ratings: list[CreateRatingResponse]
+
+class HostRatingSummary(BaseModel):
+    """Summary of all ratings for a host/instructor"""
+    host_id: str
+    host_name: str
+    average_rating: float
+    total_ratings: int
+    ratings_breakdown: dict  # {5: 10, 4: 5, 3: 2, 2: 1, 1: 0}
